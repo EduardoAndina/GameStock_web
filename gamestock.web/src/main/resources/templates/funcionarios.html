@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>GameStock | Funcionários</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/sistema.css">
+</head>
+
+<body>
+
+<div class="sidebar">
+    <h2>GAMESTOCK</h2>
+
+    <a th:href="@{/jogos}">
+        <i class="bi bi-controller"></i> Jogos
+    </a>
+
+    <a th:href="@{/funcionarios}" class="active">
+        <i class="bi bi-people"></i> Funcionários
+    </a>
+
+    <a th:href="@{/vendas}">
+        <i class="bi bi-cash-coin"></i> Vendas
+    </a>
+
+    <a th:href="@{/logout}">
+        <i class="bi bi-box-arrow-right"></i> Sair
+    </a>
+</div>
+
+<div class="main">
+
+    <div class="hero">
+        <h1>Funcionários</h1>
+        <p>Gerencie os funcionários cadastrados no sistema</p>
+    </div>
+
+    <div class="card">
+
+        <div class="table-header">
+            <h5>Lista de Funcionários</h5>
+
+            <div class="search-box-wrapper">
+                <i class="bi bi-search"></i>
+                <input type="text"
+                       class="form-control search-box"
+                       placeholder="Pesquisar funcionário"
+                       id="buscaFuncionario">
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="table table-hover align-middle" id="tabelaFuncionarios">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Usuário</th>
+                    <th>Senha</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="f : ${funcionarios}">
+                    <td th:text="${f.id}"></td>
+                    <td th:text="${f.nome}"></td>
+                    <td th:text="${f.usuario}"></td>
+                    <td th:text="${f.senha}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="action-bar">
+            <button class="btn btn-success" onclick="abrirModalCadastrar()">
+                <i class="bi bi-plus-circle"></i> Cadastrar
+            </button>
+
+            <button class="btn btn-primary" onclick="abrirModalEditar()">
+                <i class="bi bi-pencil-square"></i> Editar
+            </button>
+
+            <button class="btn btn-danger" onclick="abrirModalExcluir()">
+                <i class="bi bi-trash"></i> Excluir
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<div id="modalCadastrar" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h2>Cadastrar Funcionário</h2>
+            <button class="close-btn" onclick="fecharTodos()">&times;</button>
+        </div>
+
+        <form th:action="@{/funcionarios/salvar}" method="post" class="modal-body">
+            <label>Nome</label>
+            <input type="text" name="nome" class="modal-input" required>
+
+            <label>Usuário</label>
+            <input type="text" name="usuario" class="modal-input" required>
+
+            <label>Senha</label>
+            <input type="password" name="senha" class="modal-input" required>
+
+            <button class="btn-salvar">Salvar</button>
+        </form>
+    </div>
+</div>
+
+<div id="modalEditar" class="modal-overlay">
+    <div class="modal-box modal-grande">
+
+        <div class="modal-header">
+            <h2>Editar Funcionário</h2>
+            <button class="close-btn" onclick="fecharTodos()">&times;</button>
+        </div>
+
+        <div class="modal-body">
+
+            <!-- BUSCA COM LUPA -->
+            <div class="search-box-wrapper mb-3">
+                <i class="bi bi-search"></i>
+                <input type="text"
+                       class="form-control search-box"
+                       placeholder="Pesquisar funcionário"
+                       id="buscaEditarFuncionario">
+            </div>
+
+            <div class="table-wrapper modal-table-wrapper">
+                <table class="table table-hover" id="tabelaEditarFuncionarios">
+                    <tbody>
+                    <tr th:each="f : ${funcionarios}">
+                        <td th:text="${f.id}"></td>
+                        <td th:text="${f.nome}"></td>
+                        <td th:text="${f.usuario}"></td>
+                        <td>
+                            <button class="btn btn-sm btn-primary"
+                                    onclick="selecionarFuncionarioParaEditar(this)">
+                                Selecionar
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="editar-grid">
+                <input id="editarId" class="modal-input" readonly placeholder="ID">
+                <input id="editarNome" class="modal-input" placeholder="Nome">
+                <input id="editarUsuario" class="modal-input" placeholder="Usuário">
+                <input id="editarSenha" class="modal-input" placeholder="Senha">
+            </div>
+
+            <button class="btn-salvar mt-3" onclick="salvarEdicaoFuncionario()">
+                Atualizar
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="modalExcluir" class="modal-overlay">
+    <div class="modal-box modal-grande">
+
+        <div class="modal-header">
+            <h2>Excluir Funcionário</h2>
+            <button class="close-btn" onclick="fecharTodos()">&times;</button>
+        </div>
+
+        <div class="modal-body">
+
+            <!-- BUSCA COM LUPA -->
+            <div class="search-box-wrapper mb-3">
+                <i class="bi bi-search"></i>
+                <input type="text"
+                       class="form-control search-box"
+                       placeholder="Pesquisar funcionário"
+                       id="buscaExcluirFuncionario">
+            </div>
+
+            <table class="table table-hover" id="tabelaExcluirFuncionarios">
+                <tbody>
+                <tr th:each="f : ${funcionarios}">
+                    <td th:text="${f.id}"></td>
+                    <td th:text="${f.nome}"></td>
+                    <td>
+                        <button class="btn btn-danger btn-sm"
+                                onclick="selecionarFuncionarioParaExcluir(this)">
+                            Selecionar
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <button class="btn-salvar mt-3" onclick="confirmarExclusaoFuncionario()">
+                Excluir
+            </button>
+        </div>
+    </div>
+</div>
+
+<form id="formEditar" th:action="@{/funcionarios/editar}" method="post">
+    <input type="hidden" id="formEditarId" name="id">
+    <input type="hidden" id="formEditarNome" name="nome">
+    <input type="hidden" id="formEditarUsuario" name="usuario">
+    <input type="hidden" id="formEditarSenha" name="senha">
+</form>
+
+<form id="formExcluir" th:action="@{/funcionarios/excluir}" method="post">
+    <input type="hidden" id="formExcluirId" name="id">
+</form>
+
+<script src="funcionarios.js"></script>
+
+</body>
+</html>
+
+
+
+
